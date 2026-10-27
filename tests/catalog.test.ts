@@ -1,11 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { booksBySubject, searchCatalog } from "../src/catalog.js";
+import { booksBySubject, openstaxUrl, searchCatalog } from "../src/catalog.js";
 
 describe("searchCatalog", () => {
   it("matches by title", () => {
     const results = searchCatalog("Calculus Volume 1");
     expect(results.length).toBeGreaterThan(0);
     expect(results[0].title).toBe("Calculus Volume 1");
+    expect(openstaxUrl(results[0])).toBe("https://openstax.org/details/books/calculus-volume-1");
   });
 
   it("matches by subject", () => {
@@ -13,12 +14,16 @@ describe("searchCatalog", () => {
     expect(results.length).toBeGreaterThan(0);
     const slugs = results.map((r) => r.slug);
     expect(slugs).toContain("calculus-volume-1");
+    const book = results.find((r) => r.slug === "calculus-volume-1");
+    expect(book).toBeDefined();
+    expect(openstaxUrl(book!)).toBe("https://openstax.org/details/books/calculus-volume-1");
   });
 
   it("matches by keyword", () => {
     const results = searchCatalog("organic");
     expect(results.length).toBeGreaterThan(0);
     expect(results[0].slug).toBe("organic-chemistry");
+    expect(openstaxUrl(results[0])).toBe("https://openstax.org/details/books/organic-chemistry");
   });
 
   it("orders by score", () => {
@@ -46,12 +51,16 @@ describe("booksBySubject", () => {
     const results = booksBySubject("calculus");
     expect(results.length).toBeGreaterThan(0);
     expect(results.map((r) => r.slug)).toContain("calculus-volume-1");
+    const book = results.find((r) => r.slug === "calculus-volume-1");
+    expect(book).toBeDefined();
+    expect(openstaxUrl(book!)).toBe("https://openstax.org/details/books/calculus-volume-1");
   });
 
   it("matches by keyword", () => {
     const results = booksBySubject("organic");
     expect(results.length).toBeGreaterThan(0);
     expect(results[0].slug).toBe("organic-chemistry");
+    expect(openstaxUrl(results[0])).toBe("https://openstax.org/details/books/organic-chemistry");
   });
 
   it("returns empty for no match", () => {
