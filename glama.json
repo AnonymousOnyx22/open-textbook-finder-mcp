@@ -1,1 +1,129 @@
-{"$schema": "https://glama.ai/mcp/schemas/server.json", "name": "open-textbook-finder-mcp", "description": "Open textbook finder MCP server for AI apps. Give it a textbook title, an ISBN or a course topic and it finds free legal copies on OpenStax, the Directory of Open Access Books and Open Library, looks up editions by ISBN and suggests cheaper older editions. No API key, no account.", "type": "stdio", "license": "MIT", "repository": {"url": "https://github.com/AnonymousOnyx22/open-textbook-finder-mcp", "source": "github"}, "homepage": "https://github.com/AnonymousOnyx22/open-textbook-finder-mcp", "version": "0.1.0", "maintainers": ["AnonymousOnyx22"], "tools": [{"name": "find_free_textbook", "description": "Search for free and legal copies of a textbook on OpenStax, the Directory of Open Access Books (DOAB) and Open Library. Inputs: query (a book title, an ISBN or a course topic such as \"organic chemistry\") and an optional limit of 1 to 10 results from each source. Open Library results are marked free when there is a public domain copy to read online, and borrow when the book is a free loan. No account or key is needed. If one source is down the others still answer and the reply names the source that did not. Example prompt: \"Is there a free legal copy of the Calculus textbook by Stewart, or something close to it?\"", "parameters": [{"name": "query", "type": "string", "required": true, "description": "A textbook title, an ISBN (10 or 13 digits, hyphens allowed) or a course topic."}, {"name": "limit", "type": "integer", "required": false, "default": 5, "description": "How many results to return, 1 to 10. Defaults to 5."}], "example": {"name": "find_free_textbook", "arguments": {"query": "calculus", "limit": 5}}, "output": "A line such as \"Found 3 free copies for \"calculus\":\" followed by one line per book with the source, title, authors, year, a note on the kind of copy and the link. When no copy is free, the reply says so and shows the closest Open Library records. A source that did not answer is named at the end.", "structured_output": "query, isbn when the query was an ISBN, results and sources_unavailable. The results array holds one entry per book with source, title, authors, url, access and note, plus year when the source gives one."}, {"name": "lookup_isbn", "description": "Look up an ISBN on Open Library and return the edition details plus the other editions of the same book. Inputs: isbn (10 or 13 digits, hyphens allowed). The check digit is tested first, so a typo is reported before any search. The reply has the title, authors, publisher, publish date, page count and edition name, and says whether a free copy is known. Related editions are listed newest first. Example prompt: \"Look up ISBN 978-0-13-468599-1 and tell me what other editions exist.\"", "parameters": [{"name": "isbn", "type": "string", "required": true, "description": "The ISBN to look up, 10 or 13 digits, hyphens and spaces allowed."}], "example": {"name": "lookup_isbn", "arguments": {"isbn": "978-0-13-468599-1"}}, "output": "The title and authors, then the publisher, publish date, page count and edition name, then whether a free copy is known, then a list of other editions with the year, edition name and ISBN. A bad check digit gives an error that says the ISBN is not valid.", "structured_output": "isbn, isbn13, title, authors, publishers, url, free_copy and related_editions, plus publish_date, pages, edition_name and free_copy_url when they are known. The related_editions array holds one entry per edition with title and url, plus year, edition_name and isbn13 when known."}, {"name": "list_open_textbooks_by_subject", "description": "Browse free textbooks for a course topic. It lists matching OpenStax books and open access books from the Directory of Open Access Books (DOAB). Inputs: subject (a course topic such as \"calculus\", \"nursing\" or \"economics\") and an optional limit of 1 to 25 results. OpenStax books come first. If DOAB is down the OpenStax list still comes back and the reply says so. Example prompt: \"List free textbooks for intro statistics.\"", "parameters": [{"name": "subject", "type": "string", "required": true, "description": "A course topic or subject, like \"calculus\", \"statistics\", \"nursing\" or \"economics\"."}, {"name": "limit", "type": "integer", "required": false, "default": 10, "description": "How many results to return, 1 to 25. Defaults to 10."}], "example": {"name": "list_open_textbooks_by_subject", "arguments": {"subject": "statistics", "limit": 10}}, "output": "A line such as \"5 free textbooks for \"statistics\":\" followed by one line per book with the source, title, a note and the link.", "structured_output": "subject, results and sources_unavailable. The results array holds one entry per book with source, title, authors, url, access and note, plus year when the source gives one."}, {"name": "find_older_edition", "description": "Suggest earlier editions of a textbook, which usually cost less used than the newest one. Inputs: query (a title or an ISBN) and two optional values: edition_year, the year of the edition your course asks for, and limit, 1 to 10 suggestions. Without edition_year the newest edition Open Library lists counts as the current one, and an ISBN counts as the current edition when you pass one. Suggestions run from the closest older edition down. Editions only one or two releases back often keep the same chapters, but problem sets get reordered, so check the table of contents against your syllabus. The tool does not know prices. Example prompt: \"My course wants the 9th edition of Stewart Calculus. Is there an older edition that would work?\"", "parameters": [{"name": "query", "type": "string", "required": true, "description": "The textbook title or its ISBN."}, {"name": "edition_year", "type": "integer", "required": false, "description": "Year of the edition your course requires. Leave it out to treat the newest edition found as the current one."}, {"name": "limit", "type": "integer", "required": false, "default": 5, "description": "How many results to return, 1 to 10. Defaults to 5."}], "example": {"name": "find_older_edition", "arguments": {"query": "Calculus Early Transcendentals", "edition_year": 2020, "limit": 5}}, "output": "The older editions with the year, edition name, publisher and ISBN, each with how many years older it is, then a reminder to compare the table of contents with the syllabus before buying. When no older edition is listed, the reply says so.", "structured_output": "work_title, current_year, newest_year and suggestions. The suggestions array holds one entry per edition with title, year, years_older and url, plus edition_name, edition_number, publisher and isbn13 when known."}]}
+{
+  "$schema": "https://glama.ai/mcp/schemas/server.json",
+  "name": "open-textbook-finder-mcp",
+  "description": "Open textbook finder MCP server for AI apps. Give it a textbook title, an ISBN or a course topic and it finds free legal copies on OpenStax, the Directory of Open Access Books and Open Library, looks up editions by ISBN and suggests cheaper older editions. No API key, no account.",
+  "type": "stdio",
+  "license": "MIT",
+  "repository": {
+    "url": "https://github.com/AnonymousOnyx22/open-textbook-finder-mcp",
+    "source": "github"
+  },
+  "homepage": "https://github.com/AnonymousOnyx22/open-textbook-finder-mcp",
+  "version": "0.1.0",
+  "maintainers": [
+    "AnonymousOnyx22"
+  ],
+  "tools": [
+    {
+      "name": "find_free_textbook",
+      "description": "Search for free and legal copies of a textbook on OpenStax, the Directory of Open Access Books (DOAB) and Open Library. Inputs: query (a book title, an ISBN or a course topic such as \"organic chemistry\") and an optional limit of 1 to 10 results from each source. Open Library results are marked free when there is a public domain copy to read online, and borrow when the book is a free loan. No account or key is needed. If one source is down the others still answer and the reply names the source that did not. Example prompt: \"Is there a free legal copy of the Calculus textbook by Stewart, or something close to it?\"",
+      "parameters": [
+        {
+          "name": "query",
+          "type": "string",
+          "required": true,
+          "description": "A textbook title, an ISBN (10 or 13 digits, hyphens allowed) or a course topic."
+        },
+        {
+          "name": "limit",
+          "type": "integer",
+          "required": false,
+          "default": 5,
+          "description": "How many results to return, 1 to 10. Defaults to 5."
+        }
+      ],
+      "example": {
+        "name": "find_free_textbook",
+        "arguments": {
+          "query": "calculus",
+          "limit": 5
+        }
+      },
+      "output": "A line such as \"Found 3 free copies for \"calculus\":\" followed by one line per book with the source, title, authors, year, a note on the kind of copy and the link. When no copy is free, the reply says so and shows the closest Open Library records. A source that did not answer is named at the end.",
+      "structured_output": "query, isbn when the query was an ISBN, results and sources_unavailable. The results array holds one entry per book with source, title, authors, url, access and note, plus year when the source gives one."
+    },
+    {
+      "name": "lookup_isbn",
+      "description": "Look up an ISBN on Open Library and return the edition details plus the other editions of the same book. Inputs: isbn (10 or 13 digits, hyphens allowed). The check digit is tested first, so a typo is reported before any search. The reply has the title, authors, publisher, publish date, page count and edition name, and says whether a free copy is known. Related editions are listed newest first. Example prompt: \"Look up ISBN 978-0-13-468599-1 and tell me what other editions exist.\"",
+      "parameters": [
+        {
+          "name": "isbn",
+          "type": "string",
+          "required": true,
+          "description": "The ISBN to look up, 10 or 13 digits, hyphens and spaces allowed."
+        }
+      ],
+      "example": {
+        "name": "lookup_isbn",
+        "arguments": {
+          "isbn": "978-0-13-468599-1"
+        }
+      },
+      "output": "The title and authors, then the publisher, publish date, page count and edition name, then whether a free copy is known, then a list of other editions with the year, edition name and ISBN. A bad check digit gives an error that says the ISBN is not valid.",
+      "structured_output": "isbn, isbn13, title, authors, publishers, url, free_copy and related_editions, plus publish_date, pages, edition_name and free_copy_url when they are known. The related_editions array holds one entry per edition with title and url, plus year, edition_name and isbn13 when known."
+    },
+    {
+      "name": "list_open_textbooks_by_subject",
+      "description": "Browse free textbooks for a course topic. It lists matching OpenStax books and open access books from the Directory of Open Access Books (DOAB). Inputs: subject (a course topic such as \"calculus\", \"nursing\" or \"economics\") and an optional limit of 1 to 25 results. OpenStax books come first. If DOAB is down the OpenStax list still comes back and the reply says so. Example prompt: \"List free textbooks for intro statistics.\"",
+      "parameters": [
+        {
+          "name": "subject",
+          "type": "string",
+          "required": true,
+          "description": "A course topic or subject, like \"calculus\", \"statistics\", \"nursing\" or \"economics\"."
+        },
+        {
+          "name": "limit",
+          "type": "integer",
+          "required": false,
+          "default": 10,
+          "description": "How many results to return, 1 to 25. Defaults to 10."
+        }
+      ],
+      "example": {
+        "name": "list_open_textbooks_by_subject",
+        "arguments": {
+          "subject": "statistics",
+          "limit": 10
+        }
+      },
+      "output": "A line such as \"5 free textbooks for \"statistics\":\" followed by one line per book with the source, title, a note and the link.",
+      "structured_output": "subject, results and sources_unavailable. The results array holds one entry per book with source, title, authors, url, access and note, plus year when the source gives one."
+    },
+    {
+      "name": "find_older_edition",
+      "description": "Suggest earlier editions of a textbook, which usually cost less used than the newest one. Inputs: query (a title or an ISBN) and two optional values: edition_year, the year of the edition your course asks for, and limit, 1 to 10 suggestions. Without edition_year the newest edition Open Library lists counts as the current one, and an ISBN counts as the current edition when you pass one. Suggestions run from the closest older edition down. Editions only one or two releases back often keep the same chapters, but problem sets get reordered, so check the table of contents against your syllabus. The tool does not know prices. Example prompt: \"My course wants the 9th edition of Stewart Calculus. Is there an older edition that would work?\"",
+      "parameters": [
+        {
+          "name": "query",
+          "type": "string",
+          "required": true,
+          "description": "The textbook title or its ISBN."
+        },
+        {
+          "name": "edition_year",
+          "type": "integer",
+          "required": false,
+          "description": "Year of the edition your course requires. Leave it out to treat the newest edition found as the current one."
+        },
+        {
+          "name": "limit",
+          "type": "integer",
+          "required": false,
+          "default": 5,
+          "description": "How many results to return, 1 to 10. Defaults to 5."
+        }
+      ],
+      "example": {
+        "name": "find_older_edition",
+        "arguments": {
+          "query": "Calculus Early Transcendentals",
+          "edition_year": 2020,
+          "limit": 5
+        }
+      },
+      "output": "The older editions with the year, edition name, publisher and ISBN, each with how many years older it is, then a reminder to compare the table of contents with the syllabus before buying. When no older edition is listed, the reply says so.",
+      "structured_output": "work_title, current_year, newest_year and suggestions. The suggestions array holds one entry per edition with title, year, years_older and url, plus edition_name, edition_number, publisher and isbn13 when known."
+    }
+  ]
+}
