@@ -1,6 +1,6 @@
 # open-textbook-finder-mcp
 
-> Open textbook finder MCP server for AI apps. Give it a textbook title, an ISBN or a course topic and it finds free legal copies on OpenStax, the Directory of Open Access Books and Open Library, looks up editions by ISBN and suggests cheaper older editions. No API key needed. Free and open source, works with Claude Desktop, Claude Code, Cursor, VS Code, Windsurf and other apps that run a local MCP server.
+> Open textbook finder MCP finds free legal copies of textbooks on OpenStax, the Directory of Open Access Books and Open Library by title, ISBN or course topic, looks up editions by ISBN and suggests cheaper older editions. No API key needed. Free and open source, works with Claude Desktop, Claude Code, Cursor, VS Code, Windsurf and other apps that run a local MCP server.
 
 ## Setup
 - Run with npx -y open-textbook-finder-mcp
