@@ -32,6 +32,40 @@ describe("ISBN helpers", () => {
     expect(looksLikeIsbn("calculus")).toBe(false);
     expect(looksLikeIsbn("2020 2021 2022")).toBe(false);
   });
+
+  it("upper cases a trailing x and trims tabs and newlines", () => {
+    expect(cleanIsbn("080442957x")).toBe("080442957X");
+    expect(cleanIsbn(" 0-306-40615-2\n")).toBe("0306406152");
+    expect(cleanIsbn("")).toBe("");
+  });
+
+  it("accepts a lower case x and hyphenated input", () => {
+    expect(isValidIsbn("080442957x")).toBe(true);
+    expect(isValidIsbn("0-8044-2957-X")).toBe(true);
+  });
+
+  it("rejects an empty string, an X in the wrong place and a wrong length", () => {
+    expect(isValidIsbn("")).toBe(false);
+    expect(isValidIsbn("X306406152")).toBe(false);
+    expect(isValidIsbn("978013468599X")).toBe(false);
+    expect(isValidIsbn("97801346859910")).toBe(false);
+    expect(isValidIsbn("030640615")).toBe(false);
+  });
+
+  it("converts an ISBN 10 with an X check digit and with hyphens", () => {
+    expect(toIsbn13("0-8044-2957-X")).toBe("9780804429573");
+    expect(isValidIsbn(toIsbn13("080442957X"))).toBe(true);
+    expect(toIsbn13("978-0-13-468599-1")).toBe("9780134685991");
+  });
+
+  it("recognises an ISBN with an X and rejects other near misses", () => {
+    expect(looksLikeIsbn("0-8044-2957-X")).toBe(true);
+    expect(looksLikeIsbn("080442957x")).toBe(true);
+    expect(looksLikeIsbn("")).toBe(false);
+    expect(looksLikeIsbn("030640615")).toBe(false);
+    expect(looksLikeIsbn("calculus 0306406152")).toBe(false);
+    expect(looksLikeIsbn("97801346859911")).toBe(false);
+  });
 });
 
 describe("year and edition readers", () => {
@@ -47,6 +81,11 @@ describe("year and edition readers", () => {
     expect(editionNumber("2nd ed.")).toBe(2);
     expect(editionNumber("5e")).toBe(5);
     expect(editionNumber("Third edition")).toBe(3);
+    expect(editionNumber("12th edition")).toBe(12);
+    expect(editionNumber("3rd Edition, revised")).toBe(3);
+    expect(editionNumber("Tenth edition")).toBe(10);
+    expect(editionNumber("Calculus 7e")).toBe(7);
+    expect(editionNumber("")).toBeUndefined();
     expect(editionNumber("revised")).toBeUndefined();
     expect(editionNumber(undefined)).toBeUndefined();
   });
