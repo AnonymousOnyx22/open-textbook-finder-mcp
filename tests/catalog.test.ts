@@ -40,3 +40,22 @@ describe("searchCatalog", () => {
     expect(results).toEqual([]);
   });
 });
+
+describe("booksBySubject", () => {
+  it("matches by subject", () => {
+    const results = booksBySubject("calculus");
+    expect(results.length).toBeGreaterThan(0);
+    expect(results.map((r) => r.slug)).toContain("calculus-volume-1");
+  });
+
+  it("matches by keyword", () => {
+    const results = booksBySubject("organic");
+    expect(results.length).toBeGreaterThan(0);
+    expect(results[0].slug).toBe("organic-chemistry");
+  });
+
+  it("returns empty for no match", () => {
+    const results = booksBySubject("zzznomatch");
+    expect(results).toEqual([]);
+  });
+});
