@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- The README now compares the server against course platform MCPs (Brightspace, Canvas, Moodle and Google Classroom), so a searcher can see that this server finds free textbook copies while those servers read a course platform account.
+
 ## 0.1.0
 
 - First release. Open Textbook Finder MCP finds free legal textbooks from OpenStax, the Directory of Open Access Books (DOAB) and Open Library, with no API key and no account.

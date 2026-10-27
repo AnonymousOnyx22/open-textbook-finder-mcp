@@ -18,6 +18,9 @@
 | --- | --- | --- | --- |
 | Open Textbook Finder MCP (this server) | No | OpenStax, DOAB and Open Library in one question, plus ISBN and edition lookups | You want your AI app to check the free options before you buy a book. |
 | Searching each site yourself | No | One site at a time | You already know which site has your book. |
+| Course platform MCPs (Brightspace, Canvas, Moodle, Google Classroom) | Your account on that platform | Due dates, grades, missing work and course files from one LMS | You want your AI app to read your course platform, not to find books. |
+
+Open Textbook Finder MCP is a free textbook MCP: it needs no key and no account, and it finds legal copies of textbooks on OpenStax, DOAB and Open Library. The course platform MCPs above connect to your LMS account and show what is due, what is missing and what you have earned. They do not search for textbook copies. You can run both side by side, since they read different things and neither needs a key.
 
 ## Tools
 

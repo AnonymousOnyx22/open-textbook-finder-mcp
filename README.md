@@ -4,7 +4,7 @@
 [![downloads](https://img.shields.io/npm/dm/open-textbook-finder-mcp.svg)](https://www.npmjs.com/package/open-textbook-finder-mcp)
 [![license](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-Open Textbook Finder MCP is a free, open source [MCP](https://modelcontextprotocol.io) server, published on npm as `open-textbook-finder-mcp`. Give it a textbook title, an ISBN or a course topic and it looks for free legal copies on OpenStax, the Directory of Open Access Books (DOAB) and Open Library. It can also look up the editions of a book by ISBN and suggest older editions that usually cost less.
+Open Textbook Finder MCP is a free, open source [MCP](https://modelcontextprotocol.io) server, published on npm as `open-textbook-finder-mcp`. It is a free textbook mcp: give it a textbook title, an ISBN or a course topic and it looks for free legal copies on OpenStax, the Directory of Open Access Books (DOAB) and Open Library. It can also look up the editions of a book by ISBN and suggest older editions that usually cost less.
 
 Use it with Claude Desktop, Claude Code, Cursor, VS Code, Windsurf and any other app that runs a local MCP server. It needs no API key and no account.
 
@@ -218,6 +218,9 @@ The other sources still answer, and the reply names the source that did not. If 
 | --- | --- | --- | --- |
 | Open Textbook Finder MCP (this server) | No | OpenStax, DOAB and Open Library in one question, plus ISBN and edition lookups | You want your AI app to check the free options before you buy a book. |
 | Searching each site yourself | No | One site at a time | You already know which site has your book. |
+| Course platform MCPs (Brightspace, Canvas, Moodle, Google Classroom) | Your account on that platform | Due dates, grades, missing work and course files from one LMS | You want your AI app to read your course platform, not to find books. |
+
+Open Textbook Finder MCP is a free textbook MCP: it needs no key and no account, and it finds legal copies of textbooks on OpenStax, DOAB and Open Library. The course platform MCPs above connect to your LMS account and show what is due, what is missing and what you have earned. They do not search for textbook copies. You can run both side by side, since they read different things and neither needs a key.
 
 ## Node version
 
