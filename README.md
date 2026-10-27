@@ -10,6 +10,17 @@ Use it with Claude Desktop, Claude Code, Cursor, VS Code, Windsurf and any other
 
 Free forever. No account and no subscription.
 
+## What it does
+
+| Tool | Example prompt |
+| --- | --- |
+| `find_free_textbook` | "Is there a free legal copy of the Calculus textbook by Stewart, or something close to it?" |
+| `lookup_isbn` | "Look up ISBN 978-0-13-468599-1 and tell me what other editions exist." |
+| `find_older_edition` | "My course wants the 9th edition of Stewart Calculus. Is there an older edition that would work?" |
+| `list_open_textbooks_by_subject` | "List free textbooks for intro statistics." |
+
+See [Tools](#tools) for the parameters of each one.
+
 ## Install
 
 Run it straight from npm with `npx`. You need Node.js 20 or newer, see [Node version](#node-version) for the details. There is nothing else to install and no config file for the server itself.
