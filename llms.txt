@@ -1,0 +1,104 @@
+# open-textbook-finder-mcp
+
+> Open textbook finder MCP server for AI apps. Find free legal textbooks on OpenStax, the Directory of Open Access Books and Open Library by title, ISBN or course topic, look up editions by ISBN and find cheaper older editions. No API key, no account. Free and open source, works with Claude Desktop, Claude Code, Cursor, VS Code, Windsurf and other apps that run a local MCP server.
+
+## Setup
+- Run with npx -y open-textbook-finder-mcp
+- No API key, no account. No environment variables and nothing is stored. It needs an internet connection to reach Open Library and DOAB.
+- All four tools are read only. They only search public services and never change anything.
+
+## Sources
+- OpenStax: a list of OpenStax titles ships with the server and is matched on your computer, because OpenStax has no public search service.
+- DOAB, the Directory of Open Access Books: searched through its public search service.
+- Open Library: searched through its public search and edition services. A result has access free for a public domain copy to read online, borrow for a free loan, or none when no free copy is known.
+
+## How it compares
+
+| Option | Needs a key or account | Covers | When to use |
+| --- | --- | --- | --- |
+| Open Textbook Finder MCP (this server) | No | OpenStax, DOAB and Open Library in one question, plus ISBN and edition lookups | You want your AI app to check the free options before you buy a book. |
+| Searching each site yourself | No | One site at a time | You already know which site has your book. |
+
+## Tools
+
+Every tool below has its parameters and one example call. An example call is JSON in the MCP tools/call shape: the tool name plus its arguments. All four tools are read only.
+
+Every tool also has an output schema and returns its results as fields next to the text, so a client that reads JSON gets the results without taking them out of the sentence. The Structured output line under each tool names the fields.
+
+### find_free_textbook
+Search for free and legal copies of a textbook on OpenStax, the Directory of Open Access Books (DOAB) and Open Library. Inputs: query (a book title, an ISBN or a course topic such as "organic chemistry") and an optional limit of 1 to 10 results from each source. Open Library results are marked free when there is a public domain copy to read online, and borrow when the book is a free loan. No account or key is needed. If one source is down the others still answer and the reply names the source that did not. Example prompt: "Is there a free legal copy of the Calculus textbook by Stewart, or something close to it?"
+
+Parameters:
+- query (string, required): A textbook title, an ISBN (10 or 13 digits, hyphens allowed) or a course topic.
+- limit (integer, optional, default 5): How many results to return, 1 to 10. Defaults to 5.
+
+Example call: `{"name":"find_free_textbook","arguments":{"query":"calculus","limit":5}}`
+
+Output: a line such as "Found 3 free copies for "calculus":" followed by one line per book with the source, title, authors, year, a note on the kind of copy and the link. When no copy is free, the reply says so and shows the closest Open Library records. A source that did not answer is named at the end.
+
+Structured output: query, isbn when the query was an ISBN, results and sources_unavailable. The results array holds one entry per book with source, title, authors, url, access and note, plus year when the source gives one.
+
+### lookup_isbn
+Look up an ISBN on Open Library and return the edition details plus the other editions of the same book. Inputs: isbn (10 or 13 digits, hyphens allowed). The check digit is tested first, so a typo is reported before any search. The reply has the title, authors, publisher, publish date, page count and edition name, and says whether a free copy is known. Related editions are listed newest first. Example prompt: "Look up ISBN 978-0-13-468599-1 and tell me what other editions exist."
+
+Parameters:
+- isbn (string, required): The ISBN to look up, 10 or 13 digits, hyphens and spaces allowed.
+
+Example call: `{"name":"lookup_isbn","arguments":{"isbn":"978-0-13-468599-1"}}`
+
+Output: the title and authors, then the publisher, publish date, page count and edition name, then whether a free copy is known, then a list of other editions with the year, edition name and ISBN. A bad check digit gives an error that says the ISBN is not valid.
+
+Structured output: isbn, isbn13, title, authors, publishers, url, free_copy and related_editions, plus publish_date, pages, edition_name and free_copy_url when they are known. The related_editions array holds one entry per edition with title and url, plus year, edition_name and isbn13 when known.
+
+### list_open_textbooks_by_subject
+Browse free textbooks for a course topic. It lists matching OpenStax books and open access books from the Directory of Open Access Books (DOAB). Inputs: subject (a course topic such as "calculus", "nursing" or "economics") and an optional limit of 1 to 25 results. OpenStax books come first. If DOAB is down the OpenStax list still comes back and the reply says so. Example prompt: "List free textbooks for intro statistics."
+
+Parameters:
+- subject (string, required): A course topic or subject, like "calculus", "statistics", "nursing" or "economics".
+- limit (integer, optional, default 10): How many results to return, 1 to 25. Defaults to 10.
+
+Example call: `{"name":"list_open_textbooks_by_subject","arguments":{"subject":"statistics","limit":10}}`
+
+Output: a line such as "5 free textbooks for "statistics":" followed by one line per book with the source, title, a note and the link.
+
+Structured output: subject, results and sources_unavailable. The results array holds one entry per book with source, title, authors, url, access and note, plus year when the source gives one.
+
+### find_older_edition
+Suggest earlier editions of a textbook, which usually cost less used than the newest one. Inputs: query (a title or an ISBN) and two optional values: edition_year, the year of the edition your course asks for, and limit, 1 to 10 suggestions. Without edition_year the newest edition Open Library lists counts as the current one, and an ISBN counts as the current edition when you pass one. Suggestions run from the closest older edition down. Editions only one or two releases back often keep the same chapters, but problem sets get reordered, so check the table of contents against your syllabus. The tool does not know prices. Example prompt: "My course wants the 9th edition of Stewart Calculus. Is there an older edition that would work?"
+
+Parameters:
+- query (string, required): The textbook title or its ISBN.
+- edition_year (integer, optional): Year of the edition your course requires. Leave it out to treat the newest edition found as the current one.
+- limit (integer, optional, default 5): How many results to return, 1 to 10. Defaults to 5.
+
+Example call: `{"name":"find_older_edition","arguments":{"query":"Calculus Early Transcendentals","edition_year":2020,"limit":5}}`
+
+Output: the older editions with the year, edition name, publisher and ISBN, each with how many years older it is, then a reminder to compare the table of contents with the syllabus before buying. When no older edition is listed, the reply says so.
+
+Structured output: work_title, current_year, newest_year and suggestions. The suggestions array holds one entry per edition with title, year, years_older and url, plus edition_name, edition_number, publisher and isbn13 when known.
+
+## FAQ
+
+Does it need an API key?
+
+No. Open Library and DOAB can be searched without a key, and the OpenStax list ships with the server.
+
+Does it find pirated copies?
+
+No. It only returns OpenStax, DOAB and Open Library records, which are open licensed, public domain or legal loans.
+
+What if I only have an ISBN?
+
+Pass it to find_free_textbook or lookup_isbn. Hyphens and spaces are fine. The check digit is tested first, so a typo is reported as a bad ISBN.
+
+Can it tell me the price of an older edition?
+
+No. The tool does not know prices. It tells you which earlier editions exist so you can check a used book seller yourself.
+
+What happens if one source is down?
+
+The other sources still answer, and the reply names the source that did not. If every source is down the tool says so.
+
+## Links
+- Source and README, https://github.com/AnonymousOnyx22/open-textbook-finder-mcp
+- More free student MCP servers, https://brightspacemcp.com/more-mcps/

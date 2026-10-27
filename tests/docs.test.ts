@@ -1,0 +1,211 @@
+import { describe, it, expect } from "vitest";
+import { readFileSync } from "node:fs";
+import { z } from "zod";
+import { tools } from "../src/tools.js";
+import { fakeApi } from "./fakes.js";
+
+const llms = readFileSync(new URL("../llms.txt", import.meta.url), "utf8");
+const glama = JSON.parse(readFileSync(new URL("../glama.json", import.meta.url), "utf8")) as {
+  description: string;
+  version: string;
+  tools: {
+    name: string;
+    description: string;
+    parameters: {
+      name: string;
+      type: string | string[];
+      required: boolean;
+      description: string;
+      enum?: string[];
+      default?: unknown;
+    }[];
+    example: { name: string; arguments: Record<string, unknown> };
+    output: string;
+    structured_output: string;
+  }[];
+};
+
+const CLAIM = "No API key, no account.";
+
+interface LlmsTool {
+  name: string;
+  description: string;
+  parametersLine: string;
+  blocks: { name: string; text: string; fields: string[] }[];
+  example: { name: string; arguments: Record<string, unknown> };
+  output: string;
+  structuredOutput: string;
+}
+
+/** The tool sections of llms.txt, from the "## Tools" heading down. */
+function parseLlmsTools(text: string): LlmsTool[] {
+  const section = text.slice(text.indexOf("## Tools"));
+  return section
+    .split(/^### /m)
+    .slice(1)
+    .map((raw) => {
+      const all = raw.split("\n");
+      const nextHeading = all.findIndex((l) => /^## /.test(l));
+      const lines = nextHeading === -1 ? all : all.slice(0, nextHeading);
+      const part = lines.join("\n");
+      const name = lines[0].trim();
+      const exampleText = /^Example call: `(.*)`$/m.exec(part)?.[1];
+      if (!exampleText) throw new Error(`llms.txt: no example call for ${name}`);
+      const blocks: LlmsTool["blocks"] = [];
+      let current: (typeof blocks)[number] | undefined;
+      for (const line of lines) {
+        const top = /^-\ (\w+)/.exec(line);
+        const nested = /^\s+- (\w+)/.exec(line);
+        if (top) {
+          current = { name: top[1], text: line.trim(), fields: [] };
+          blocks.push(current);
+        } else if (nested && current) {
+          current.fields.push(nested[1]);
+        }
+      }
+      return {
+        name,
+        description: lines[1].trim(),
+        parametersLine: /^Parameters: (.*)$/m.exec(part)?.[1] ?? "",
+        blocks,
+        example: JSON.parse(exampleText),
+        output: /^Output: (.*)$/m.exec(part)?.[1] ?? "",
+        structuredOutput: /^Structured output: (.*)$/m.exec(part)?.[1] ?? "",
+      };
+    });
+}
+
+/** The property names a tool requires, the same list the JSON schema gives a client. */
+function requiredNames(tool: (typeof tools)[number]): string[] {
+  const schema = z.toJSONSchema(z.object(tool.inputSchema), { io: "input" }) as { required?: string[] };
+  return schema.required ?? [];
+}
+
+/** The types a JSON schema allows, as a sorted list. */
+function schemaTypes(schema: unknown): string[] {
+  const s = schema as { type?: string | string[]; anyOf?: unknown[] };
+  if (Array.isArray(s.type)) return [...s.type].sort();
+  if (s.type) return [s.type];
+  if (Array.isArray(s.anyOf)) return s.anyOf.flatMap(schemaTypes).sort();
+  return [];
+}
+
+/** The names of every field of a JSON schema, including the fields inside arrays and nested objects. */
+function schemaFields(schema: unknown, names: string[] = []): string[] {
+  const s = schema as { properties?: Record<string, unknown> };
+  for (const [key, def] of Object.entries(s?.properties ?? {})) {
+    names.push(key);
+    const field = def as { items?: unknown; properties?: unknown };
+    if (field.items) schemaFields(field.items, names);
+    if (field.properties) schemaFields(field, names);
+  }
+  return names;
+}
+
+const llmsTools = parseLlmsTools(llms);
+
+describe("llms.txt and glama.json list every tool", () => {
+  it("lists every tool from src/tools.ts in llms.txt, once and in the same order", () => {
+    expect(llmsTools.map((t) => t.name)).toEqual(tools.map((t) => t.name));
+  });
+
+  it("lists every tool from src/tools.ts in glama.json, once and in the same order", () => {
+    expect(glama.tools.map((t) => t.name)).toEqual(tools.map((t) => t.name));
+  });
+
+  it("uses the tool descriptions from src/tools.ts in llms.txt", () => {
+    for (const tool of tools) {
+      const listed = llmsTools.find((t) => t.name === tool.name)!;
+      expect(listed.description, `llms.txt description for ${tool.name}`).toBe(tool.description);
+    }
+  });
+
+  it("uses the tool descriptions from src/tools.ts in glama.json", () => {
+    for (const tool of tools) {
+      const listed = glama.tools.find((t) => t.name === tool.name)!;
+      expect(listed.description, `glama.json description for ${tool.name}`).toBe(tool.description);
+    }
+  });
+
+  it("gives the same version in glama.json as in package.json", () => {
+    const pkg = JSON.parse(readFileSync(new URL("../package.json", import.meta.url), "utf8"));
+    expect(glama.version).toBe(pkg.version);
+  });
+});
+
+describe("every tool has its parameters and an example", () => {
+  for (const tool of tools) {
+    it(`llms.txt documents ${tool.name} with its parameters and a valid example call`, () => {
+      const doc = llmsTools.find((t) => t.name === tool.name)!;
+      const props = Object.keys(tool.inputSchema);
+      expect(doc.blocks.map((b) => b.name), `${tool.name} parameters in llms.txt`).toEqual(props);
+      for (const p of props) {
+        const schema = z.toJSONSchema(tool.inputSchema[p], { io: "input" }) as Record<string, unknown>;
+        const block = doc.blocks.find((b) => b.name === p)!;
+        expect(block.text, `${tool.name}.${p} in llms.txt`).toContain(schema.description as string);
+      }
+      expect(doc.example.name).toBe(tool.name);
+      expect(z.object(tool.inputSchema).safeParse(doc.example.arguments).success, `${tool.name} example`).toBe(true);
+      expect(doc.output.length, `${tool.name} output`).toBeGreaterThan(0);
+    });
+
+    it(`glama.json documents ${tool.name} with its parameters and a valid example call`, () => {
+      const doc = glama.tools.find((t) => t.name === tool.name)!;
+      const props = Object.keys(tool.inputSchema);
+      expect(doc.parameters.map((p) => p.name), `${tool.name} parameter names`).toEqual(props);
+      for (const p of doc.parameters) {
+        const schema = z.toJSONSchema(tool.inputSchema[p.name], { io: "input" }) as Record<string, unknown>;
+        expect(p.required, `${tool.name}.${p.name} required flag`).toBe(requiredNames(tool).includes(p.name));
+        expect(p.description, `${tool.name}.${p.name} description`).toBe(schema.description);
+        expect(schemaTypes({ type: p.type }), `${tool.name}.${p.name} type`).toEqual(schemaTypes(schema));
+        if (schema.default !== undefined) expect(p.default, `${tool.name}.${p.name} default`).toBe(schema.default);
+      }
+      expect(doc.example.name).toBe(tool.name);
+      expect(z.object(tool.inputSchema).safeParse(doc.example.arguments).success, `${tool.name} example`).toBe(true);
+      expect(doc.output.length, `${tool.name} output`).toBeGreaterThan(0);
+    });
+
+    it(`llms.txt and glama.json give ${tool.name} the same example call`, () => {
+      const inLlms = llmsTools.find((t) => t.name === tool.name)!.example;
+      const inGlama = glama.tools.find((t) => t.name === tool.name)!.example;
+      expect(inGlama).toEqual(inLlms);
+    });
+
+    it(`the example call of ${tool.name} runs on the fake network without an error`, async () => {
+      const example = llmsTools.find((t) => t.name === tool.name)!.example;
+      const args = z.object(tool.inputSchema).parse(example.arguments);
+      const out = await tool.run(args, fakeApi());
+      expect(out.text.length).toBeGreaterThan(0);
+      expect(z.object(tool.outputSchema!).safeParse(out.structured).success).toBe(true);
+    });
+  }
+});
+
+describe("the structured output the docs list", () => {
+  for (const tool of tools) {
+    it(`llms.txt and glama.json name every field of the output schema of ${tool.name}`, () => {
+      const schema = z.toJSONSchema(z.object(tool.outputSchema!), { io: "output" }) as Record<string, unknown>;
+      const fields = schemaFields(schema);
+      expect(fields.length, `the fields of ${tool.name}`).toBeGreaterThan(0);
+      const inLlms = llmsTools.find((t) => t.name === tool.name)!.structuredOutput;
+      const inGlama = glama.tools.find((t) => t.name === tool.name)!.structured_output;
+      for (const field of fields) {
+        expect(inLlms, `llms.txt structured output for ${tool.name}`).toContain(field);
+        expect(inGlama, `glama.json structured output for ${tool.name}`).toContain(field);
+      }
+    });
+
+    it(`llms.txt and glama.json give ${tool.name} the same structured output`, () => {
+      expect(glama.tools.find((t) => t.name === tool.name)!.structured_output).toBe(
+        llmsTools.find((t) => t.name === tool.name)!.structuredOutput,
+      );
+    });
+  }
+});
+
+describe("the no key and no account claim", () => {
+  it("appears word for word in llms.txt and glama.json", () => {
+    expect(llms).toContain(CLAIM);
+    expect(glama.description).toContain(CLAIM);
+  });
+});

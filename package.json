@@ -1,0 +1,79 @@
+{
+  "name": "open-textbook-finder-mcp",
+  "version": "0.1.0",
+  "description": "Open textbook finder MCP server for AI apps. Give it a textbook title, an ISBN or a course topic and it finds free legal copies on OpenStax, the Directory of Open Access Books and Open Library, looks up editions by ISBN and suggests cheaper older editions. No API key needed.",
+  "type": "module",
+  "main": "build/src/index.js",
+  "bin": {
+    "open-textbook-finder-mcp": "build/src/index.js"
+  },
+  "files": [
+    "build/src",
+    "README.md",
+    "llms.txt",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "devEngines": {
+    "runtime": {
+      "name": "node",
+      "version": "^22.12.0 || ^24.0.0 || >=26.0.0"
+    }
+  },
+  "scripts": {
+    "build": "tsc && node -e \"require('fs').chmodSync('build/src/index.js', 0o755)\"",
+    "test": "vitest run",
+    "start": "node build/src/index.js",
+    "prepublishOnly": "npm run build && npm test"
+  },
+  "keywords": [
+    "open textbook finder mcp",
+    "open textbook finder",
+    "open textbooks",
+    "free textbooks",
+    "free textbook finder",
+    "openstax",
+    "openstax mcp",
+    "open library",
+    "open library mcp",
+    "doab",
+    "directory of open access books",
+    "open educational resources",
+    "oer",
+    "isbn lookup",
+    "isbn",
+    "older edition textbook",
+    "cheap textbooks",
+    "public domain books",
+    "textbook",
+    "college textbooks",
+    "student",
+    "mcp",
+    "mcp server",
+    "mcp-server",
+    "model-context-protocol"
+  ],
+  "author": "AnonymousOnyx22",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AnonymousOnyx22/open-textbook-finder-mcp.git"
+  },
+  "homepage": "https://github.com/AnonymousOnyx22/open-textbook-finder-mcp#readme",
+  "bugs": {
+    "url": "https://github.com/AnonymousOnyx22/open-textbook-finder-mcp/issues"
+  },
+  "mcpName": "io.github.AnonymousOnyx22/open-textbook-finder-mcp",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.32.1",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.5",
+    "typescript": "^7.0.2",
+    "vitest": "^5.0.5"
+  }
+}
