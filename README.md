@@ -4,7 +4,7 @@
 [![downloads](https://img.shields.io/npm/dm/open-textbook-finder-mcp.svg)](https://www.npmjs.com/package/open-textbook-finder-mcp)
 [![license](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-Open textbook finder MCP finds free legal copies of textbooks on OpenStax, the Directory of Open Access Books (DOAB) and Open Library by title, ISBN or course topic. It looks up editions by ISBN and suggests older editions that usually cost less.
+Open Textbook Finder MCP finds free legal copies of textbooks on OpenStax, the Directory of Open Access Books (DOAB) and Open Library by title, ISBN or course topic. It looks up editions by ISBN and suggests older editions that usually cost less.
 
 Use it with Claude Desktop, Claude Code, Cursor, VS Code, Windsurf and any other app that runs a local MCP server. It needs no API key and no account.
 

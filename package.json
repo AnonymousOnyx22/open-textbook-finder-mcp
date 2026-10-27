@@ -1,7 +1,7 @@
 {
   "name": "open-textbook-finder-mcp",
   "version": "0.1.0",
-  "description": "Open textbook finder MCP finds free legal copies of textbooks on OpenStax, the Directory of Open Access Books and Open Library by title, ISBN or course topic, looks up editions and suggests cheaper older editions. No API key needed.",
+  "description": "Open Textbook Finder MCP finds free legal copies of textbooks on OpenStax, the Directory of Open Access Books and Open Library by title, ISBN or course topic, looks up editions and suggests cheaper older editions. No API key needed.",
   "type": "module",
   "main": "build/src/index.js",
   "bin": {

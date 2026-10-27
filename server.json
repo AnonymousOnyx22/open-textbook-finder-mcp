@@ -1,7 +1,7 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.AnonymousOnyx22/open-textbook-finder-mcp",
-  "description": "Open textbook finder MCP finds free legal copies by title, ISBN or topic. No key.",
+  "description": "Open Textbook Finder MCP finds free legal copies by title, ISBN or topic. No key.",
   "repository": {
     "url": "https://github.com/AnonymousOnyx22/open-textbook-finder-mcp",
     "source": "github"
