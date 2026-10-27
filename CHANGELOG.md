@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- The first screen of the README now leads with the problem, a one line install and three example prompts for faster setup.
 - The README now compares the server against course platform MCPs (Brightspace, Canvas, Moodle and Google Classroom), so a searcher can see that this server finds free textbook copies while those servers read a course platform account.
 
 ## 0.1.0
