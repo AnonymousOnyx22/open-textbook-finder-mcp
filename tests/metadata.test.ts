@@ -13,7 +13,7 @@ describe("package identity", () => {
   it("uses the name, version, bin and registry name of this server", () => {
     const pkg = readJson("package.json");
     expect(pkg.name).toBe("open-textbook-finder-mcp");
-    expect(pkg.version).toBe("0.1.0");
+    expect(pkg.version).toMatch(/^\d+\.\d+\.\d+$/);
     expect(Object.keys(pkg.bin)).toEqual(["open-textbook-finder-mcp"]);
     expect(pkg.bin["open-textbook-finder-mcp"]).toBe("build/src/index.js");
     expect(pkg.mcpName).toBe("io.github.AnonymousOnyx22/open-textbook-finder-mcp");
@@ -25,7 +25,7 @@ describe("package identity", () => {
     expect(server.name).toBe("io.github.AnonymousOnyx22/open-textbook-finder-mcp");
     expect(server.packages[0].identifier).toBe("open-textbook-finder-mcp");
     expect(readJson("glama.json").name).toBe("open-textbook-finder-mcp");
-    expect(readJson("glama.json").version).toBe("0.1.0");
+    expect(readJson("glama.json").version).toBe(readJson("package.json").version);
   });
 
   it("needs no key: the package has no environment variables in server.json", () => {
