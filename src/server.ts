@@ -3,7 +3,7 @@ import { registerTools } from "./core/tools.js";
 import { createApi, type Api } from "./sources.js";
 import { tools } from "./tools.js";
 
-export const VERSION = "0.1.0";
+export const VERSION = "0.1.1";
 
 export function createServer(api: Api = createApi()): McpServer {
   const server = new McpServer({ name: "open-textbook-finder-mcp", version: VERSION });
