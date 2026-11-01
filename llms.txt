@@ -51,7 +51,7 @@ Example call: `{"name":"lookup_isbn","arguments":{"isbn":"978-0-13-468599-1"}}`
 
 Output: the title and authors, then the publisher, publish date, page count and edition name, then whether a free copy is known, then a list of other editions with the year, edition name and ISBN. A bad check digit gives an error that says the ISBN is not valid.
 
-Structured output: isbn, isbn13, title, authors, publishers, url, free_copy and related_editions, plus publish_date, pages, edition_name and free_copy_url when they are known. The related_editions array holds one entry per edition with title and url, plus year, edition_name and isbn13 when known.
+Structured output: isbn, isbn13, title, authors, publishers, url, free_copy and related_editions, plus publish_date, pages, edition_name, free_copy_url and openstax_alternative when they are known. The related_editions array holds one entry per edition with title and url, plus year, edition_name and isbn13 when known.
 
 ### list_open_textbooks_by_subject
 Browse free textbooks for a course topic. It lists matching OpenStax books and open access books from the Directory of Open Access Books (DOAB). Inputs: subject (a course topic such as "calculus", "nursing" or "economics") and an optional limit of 1 to 25 results. OpenStax books come first. If DOAB is down the OpenStax list still comes back and the reply says so. Example prompt: "List free textbooks for intro statistics."

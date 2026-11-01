@@ -60,7 +60,7 @@
         }
       },
       "output": "The title and authors, then the publisher, publish date, page count and edition name, then whether a free copy is known, then a list of other editions with the year, edition name and ISBN. A bad check digit gives an error that says the ISBN is not valid.",
-      "structured_output": "isbn, isbn13, title, authors, publishers, url, free_copy and related_editions, plus publish_date, pages, edition_name and free_copy_url when they are known. The related_editions array holds one entry per edition with title and url, plus year, edition_name and isbn13 when known."
+      "structured_output": "isbn, isbn13, title, authors, publishers, url, free_copy and related_editions, plus publish_date, pages, edition_name, free_copy_url and openstax_alternative when they are known. The related_editions array holds one entry per edition with title and url, plus year, edition_name and isbn13 when known."
     },
     {
       "name": "list_open_textbooks_by_subject",

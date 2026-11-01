@@ -148,6 +148,13 @@ export const tools: ToolDef<Api>[] = [
       url: z.string().describe("The Open Library page for this edition."),
       free_copy: z.boolean().describe("True when a free copy to read online is known."),
       free_copy_url: z.string().optional().describe("Where to read the free copy, when there is one."),
+      openstax_alternative: z
+        .object({
+          title: z.string().describe("Title of the OpenStax textbook."),
+          url: z.string().describe("The OpenStax page for the textbook."),
+        })
+        .optional()
+        .describe("A free OpenStax textbook on the same topic, when the built in catalog has one that matches the title."),
       related_editions: z
         .array(
           z.object({
@@ -181,6 +188,8 @@ export const tools: ToolDef<Api>[] = [
         `Publisher: ${edition.publishers.join(", ") || "not listed"}. Published: ${edition.publish_date ?? "date not listed"}.${edition.pages ? ` ${edition.pages} pages.` : ""}${edition.edition_name ? ` Edition: ${edition.edition_name}.` : ""}`,
         free ? `A free copy is available to read online: ${book!.url}` : "No free copy of this edition is known.",
       ];
+      const alternative = searchCatalog(edition.title, 1)[0];
+      if (alternative) lines.push(`A free OpenStax textbook on the same topic exists: ${alternative.title}, ${openstaxUrl(alternative)}`);
       let text = lines.join("\n");
       if (related.length) {
         text += `\n\nOther editions:\n${bullets(related.map((e) => `${e.year ?? "year unknown"}${e.edition_name ? `, ${e.edition_name}` : ""}${e.isbn13 ? `, ISBN ${e.isbn13}` : ""}`))}`;
@@ -207,6 +216,7 @@ export const tools: ToolDef<Api>[] = [
       if (edition.pages !== undefined) structured.pages = edition.pages;
       if (edition.edition_name) structured.edition_name = edition.edition_name;
       if (free) structured.free_copy_url = book!.url;
+      if (alternative) structured.openstax_alternative = { title: alternative.title, url: openstaxUrl(alternative) };
       return { text, structured };
     },
   },

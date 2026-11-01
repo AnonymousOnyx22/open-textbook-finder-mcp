@@ -132,6 +132,12 @@ describe("lookup_isbn", () => {
     expect(s.free_copy_url).toBe("https://archive.org/details/stewartcalc");
   });
 
+  it("adds a free OpenStax alternative when the catalog matches the title", async () => {
+    const { s, text } = await run("lookup_isbn", { isbn: "9780134685991" });
+    expect(s.openstax_alternative).toEqual({ title: "Calculus Volume 1", url: "https://openstax.org/details/books/calculus-volume-1" });
+    expect(text).toContain("A free OpenStax textbook on the same topic exists: Calculus Volume 1");
+  });
+
   it("reports an ISBN that Open Library does not know", async () => {
     await expect(run("lookup_isbn", { isbn: "9780306406157" })).rejects.toThrow(/Not found/);
   });
