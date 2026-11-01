@@ -1,6 +1,6 @@
 # Open Textbook Finder MCP
 
-Textbooks cost too much. Open Textbook Finder MCP finds free legal copies of textbooks on OpenStax, the Directory of Open Access Books (DOAB) and Open Library by title, ISBN or course topic. It looks up editions by ISBN and suggests older editions that usually cost less.
+Textbooks cost too much. Open Textbook Finder MCP finds free legal copies of textbooks on OpenStax, the Directory of Open Access Books (DOAB) and Open Library by title, ISBN or course topic. It looks up editions by ISBN and suggests older editions that usually cost less. Use it when you want a free college textbook pdf or a way to go from an ISBN to free textbook copies.
 
 ```bash
 npx -y open-textbook-finder-mcp
