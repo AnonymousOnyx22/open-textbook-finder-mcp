@@ -1,4 +1,7 @@
 export class ApiError extends Error {
+  /** Raw Retry-After header of the failed response, if any. */
+  retryAfter: string | null = null;
+
   constructor(
     message: string,
     public status: number,
@@ -15,6 +18,10 @@ export interface ClientOptions {
   /** Query params added to every request (used by APIs that put the token in the URL). */
   defaultQuery?: Record<string, string>;
   timeoutMs?: number;
+  /** Extra attempts after a 429 or 5xx answer. Default 2. */
+  retries?: number;
+  /** Wait before the first retry, doubled each time. A Retry-After header wins. Capped at 5s. Default 500. */
+  retryDelayMs?: number;
   fetchImpl?: typeof fetch;
 }
 
@@ -49,11 +56,35 @@ function nextLink(header: string | null): string | null {
   return null;
 }
 
+const MAX_RETRY_WAIT_MS = 5000;
+
+const sleep = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
+
+function retryWait(retryAfter: string | null, attempt: number, baseMs: number): number {
+  const seconds = Number(retryAfter);
+  const wait = retryAfter && Number.isFinite(seconds) && seconds >= 0 ? seconds * 1000 : baseMs * 2 ** attempt;
+  return Math.min(wait, MAX_RETRY_WAIT_MS);
+}
+
 export function createClient(opts: ClientOptions): HttpClient {
   const doFetch = opts.fetchImpl ?? fetch;
   const timeout = opts.timeoutMs ?? 20000;
+  const retries = opts.retries ?? 2;
+  const retryDelay = opts.retryDelayMs ?? 500;
 
   async function request(url: string): Promise<Response> {
+    for (let attempt = 0; ; attempt++) {
+      try {
+        return await requestOnce(url);
+      } catch (err) {
+        const retryable = err instanceof ApiError && (err.status === 429 || err.status >= 500);
+        if (!retryable || attempt >= retries) throw err;
+        await sleep(retryWait(err.retryAfter, attempt, retryDelay));
+      }
+    }
+  }
+
+  async function requestOnce(url: string): Promise<Response> {
     const ctrl = new AbortController();
     const timer = setTimeout(() => ctrl.abort(), timeout);
     try {
@@ -63,7 +94,9 @@ export function createClient(opts: ClientOptions): HttpClient {
       });
       if (!res.ok) {
         const body = await res.text().catch(() => "");
-        throw new ApiError(describeStatus(res.status), res.status, body.slice(0, 500));
+        const err = new ApiError(describeStatus(res.status), res.status, body.slice(0, 500));
+        err.retryAfter = res.headers.get("retry-after");
+        throw err;
       }
       return res;
     } catch (err) {
