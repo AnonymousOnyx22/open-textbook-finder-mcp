@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { type ToolDef, bullets } from "./core/tools.js";
-import { booksBySubject, openstaxUrl, searchCatalog, type CatalogBook } from "./catalog.js";
+import { booksBySubject, openstaxUrl, nearestCatalog, searchCatalog, type CatalogBook } from "./catalog.js";
 import {
   type Api,
   type EditionInfo,
@@ -306,7 +306,10 @@ export const tools: ToolDef<Api>[] = [
         workKey = docs[0]?.key?.startsWith("/works/") ? docs[0].key : undefined;
         workTitle = docs[0]?.title ?? query;
       }
-      if (!workKey) throw new Error(`Open Library has no editions linked to "${query}". Check the spelling, or search with the ISBN from the back of the book.`);
+      if (!workKey) {
+        const close = nearestCatalog(query).map((b) => b.title).join(", ");
+        throw new Error(`Open Library has no editions linked to "${query}". Check the spelling, or search with the ISBN from the back of the book. Close free OpenStax titles: ${close}. Try find_free_textbook to look for a free copy.`);
+      }
       const all = (await olWorkEditions(api, workKey, 100)).filter((e) => e.year !== undefined);
       if (!all.length) throw new Error(`Open Library lists no dated editions for "${workTitle}", so there is nothing to compare.`);
       const newest = Math.max(...all.map((e) => e.year!));

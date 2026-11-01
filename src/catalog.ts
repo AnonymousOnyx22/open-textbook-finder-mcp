@@ -121,6 +121,28 @@ export function searchCatalog(query: string, limit = 5): CatalogBook[] {
     .map((r) => r.book);
 }
 
+const bigrams = (text: string): Set<string> => {
+  const t = norm(text).replace(/ /g, "");
+  const out = new Set<string>();
+  for (let i = 0; i < t.length - 1; i++) out.add(t.slice(i, i + 2));
+  return out;
+};
+
+/** The closest catalog titles to a query, even when no word matches. Word matches rank first, then spelling likeness. */
+export function nearestCatalog(query: string, limit = 3): CatalogBook[] {
+  const q = bigrams(query);
+  const likeness = (book: CatalogBook): number => {
+    const b = bigrams(book.title);
+    let shared = 0;
+    for (const g of q) if (b.has(g)) shared++;
+    return q.size + b.size ? (2 * shared) / (q.size + b.size) : 0;
+  };
+  return OPENSTAX.map((book) => ({ book, score: scoreBook(book, query) + likeness(book) }))
+    .sort((a, b) => b.score - a.score)
+    .slice(0, limit)
+    .map((r) => r.book);
+}
+
 /** Books for a subject such as "calculus" or "science", matching the subject list first. */
 export function booksBySubject(subject: string): CatalogBook[] {
   const words = terms(subject);

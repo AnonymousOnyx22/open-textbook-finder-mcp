@@ -243,5 +243,6 @@ describe("find_older_edition", () => {
 
   it("explains when Open Library has no book for the title", async () => {
     await expect(run("find_older_edition", { query: "nothingatall" })).rejects.toThrow(/no editions linked/);
+    await expect(run("find_older_edition", { query: "nothingatall" })).rejects.toThrow(/find_free_textbook/);
   });
 });
