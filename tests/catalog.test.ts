@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { booksBySubject, openstaxUrl, searchCatalog } from "../src/catalog.js";
+import { OPENSTAX, booksBySubject, openstaxUrl, searchCatalog } from "../src/catalog.js";
 
 describe("searchCatalog", () => {
   it("matches by title", () => {
@@ -67,4 +67,57 @@ describe("booksBySubject", () => {
     const results = booksBySubject("zzznomatch");
     expect(results).toEqual([]);
   });
+});
+
+const ADDED_SLUGS = [
+  "principles-finance",
+  "entrepreneurship",
+  "organizational-behavior",
+  "human-resource-management",
+  "principles-marketing",
+  "business-ethics",
+  "principles-data-science",
+  "introduction-intellectual-property",
+  "introduction-political-science",
+  "introduction-anthropology",
+  "introduction-behavioral-neuroscience",
+  "world-history-volume-2",
+  "biology-ap-courses",
+  "college-physics-ap-courses-2e",
+  "medical-surgical-nursing",
+  "clinical-nursing-skills",
+  "maternal-newborn-nursing",
+  "psychiatric-mental-health-nursing",
+  "population-health",
+];
+
+describe("added OpenStax titles", () => {
+  it("has unique, well formed slugs", () => {
+    const slugs = OPENSTAX.map((b) => b.slug);
+    expect(new Set(slugs).size).toBe(slugs.length);
+    for (const slug of slugs) expect(slug).toMatch(/^[a-z0-9]+(-[a-z0-9]+)*$/);
+  });
+
+  for (const slug of ADDED_SLUGS) {
+    describe(slug, () => {
+      const book = OPENSTAX.find((b) => b.slug === slug);
+
+      it("is in the catalog with a valid openstaxUrl", () => {
+        expect(book).toBeDefined();
+        expect(openstaxUrl(book!)).toBe(`https://openstax.org/details/books/${slug}`);
+      });
+
+      it("is found by searchCatalog on its title", () => {
+        const found = searchCatalog(book!.title, OPENSTAX.length).find((b) => b.slug === slug);
+        expect(found).toBeDefined();
+        expect(openstaxUrl(found!)).toBe(`https://openstax.org/details/books/${slug}`);
+      });
+
+      it("is found by booksBySubject on its subject and title", () => {
+        const subject = book!.subjects[book!.subjects.length - 1];
+        expect(booksBySubject(subject).map((b) => b.slug)).toContain(slug);
+        expect(booksBySubject(book!.title).map((b) => b.slug)).toContain(slug);
+      });
+    });
+  }
 });
