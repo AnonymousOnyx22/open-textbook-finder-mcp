@@ -73,6 +73,8 @@ describe("find_free_textbook", () => {
     const { s, text } = await run("find_free_textbook", { query: "nothingatall" });
     expect(s.results).toEqual([]);
     expect(text).toContain("Nothing found");
+    expect(text).toContain("list_open_textbooks_by_subject");
+    expect(text).toContain("find_older_edition");
   });
 
   it("still answers when one source is down and names it", async () => {

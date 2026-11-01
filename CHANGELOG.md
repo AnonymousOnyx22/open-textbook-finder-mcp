@@ -3,6 +3,7 @@
 ## Unreleased
 
 - Searches that include an author or publisher name, such as "Stewart Calculus", now match on the remaining words instead of ranking lower or dropping results.
+- When find_free_textbook finds nothing, the reply now points to list_open_textbooks_by_subject and find_older_edition as next steps.
 
 ## 0.1.2
 

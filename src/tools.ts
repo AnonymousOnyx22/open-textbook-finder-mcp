@@ -113,7 +113,7 @@ export const tools: ToolDef<Api>[] = [
       const free = results.filter((b) => b.access !== "none").length;
       let text: string;
       if (!results.length) {
-        text = `Nothing found for "${query}". Try the course topic instead of the exact title, for example "statistics" or "accounting".`;
+        text = `Nothing found for "${query}". Try the course topic instead of the exact title, for example "statistics" or "accounting". You can also try list_open_textbooks_by_subject for the course topic, or find_older_edition for a cheaper print copy.`;
       } else if (!free) {
         text = `No free copy was found for "${query}". Open Library knows the title, so these are the closest records:\n${bullets(results.map(bookLine))}\nTry list_open_textbooks_by_subject for the course topic, or find_older_edition for a cheaper print copy.`;
       } else {
