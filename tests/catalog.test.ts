@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { OPENSTAX, booksBySubject, openstaxUrl, searchCatalog } from "../src/catalog.js";
+import { OPENSTAX, booksBySubject, openstaxUrl, scoreBook, searchCatalog, terms } from "../src/catalog.js";
 
 describe("searchCatalog", () => {
   it("matches by title", () => {
@@ -7,6 +7,12 @@ describe("searchCatalog", () => {
     expect(results.length).toBeGreaterThan(0);
     expect(results[0].title).toBe("Calculus Volume 1");
     expect(openstaxUrl(results[0])).toBe("https://openstax.org/details/books/calculus-volume-1");
+  });
+
+  it("ignores author and publisher words such as Stewart", () => {
+    expect(terms("Stewart Calculus")).toEqual(["calculus"]);
+    expect(searchCatalog("Stewart Larson Thomas Calculus").map((r) => r.slug)).toContain("calculus-volume-1");
+    expect(scoreBook(OPENSTAX[0], "Stewart Calculus")).toBe(scoreBook(OPENSTAX[0], "Calculus"));
   });
 
   it("matches by subject", () => {

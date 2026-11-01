@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Searches that include an author or publisher name, such as "Stewart Calculus", now match on the remaining words instead of ranking lower or dropping results.
+
 ## 0.1.2
 
 - The built in OpenStax list now includes more titles, such as Principles of Finance, Entrepreneurship, Organizational Behavior, Human Resource Management, Principles of Marketing and several nursing books, so searches and subject lists find them.

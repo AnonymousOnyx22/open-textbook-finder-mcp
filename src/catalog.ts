@@ -83,11 +83,15 @@ const norm = (s: string): string => s.toLowerCase().replace(/[^a-z0-9 ]/g, " ").
 
 const STOP = new Set(["the", "a", "an", "and", "of", "to", "for", "in", "intro", "introduction", "introductory", "edition", "ed", "textbook", "book", "free", "to"]);
 
-/** The words of a query that carry meaning, so "the calculus book" matches on calculus. */
+// Author and publisher names people put in a query. The catalog does not store them, so they
+// must not count as words a book has to match.
+const NAMES = new Set(["stewart", "larson", "thomas", "openstax", "pearson", "mcgraw", "wiley", "cengage"]);
+
+/** The words of a query that carry meaning, so "the calculus book" matches on calculus. Author and publisher names are left out. */
 export function terms(text: string): string[] {
   return norm(text)
     .split(" ")
-    .filter((w) => w && !STOP.has(w) && !/^\d+(e|st|nd|rd|th)?$/.test(w));
+    .filter((w) => w && !STOP.has(w) && !NAMES.has(w) &&!/^\d+(e|st|nd|rd|th)?$/.test(w));
 }
 
 /** Score a book against a query. 0 means no match. */
