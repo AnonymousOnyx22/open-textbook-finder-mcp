@@ -29,7 +29,7 @@ Every tool below has its parameters and one example call. An example call is JSO
 Every tool also has an output schema and returns its results as fields next to the text, so a client that reads JSON gets the results without taking them out of the sentence. The Structured output line under each tool names the fields.
 
 ### find_free_textbook
-Search for free and legal copies of a textbook on OpenStax, the Directory of Open Access Books (DOAB) and Open Library. Inputs: query (a book title, an ISBN or a course topic such as "organic chemistry") and an optional limit of 1 to 10 results from each source. Open Library results are marked free when there is a public domain copy to read online, and borrow when the book is a free loan. No account or key is needed. If one source is down the others still answer and the reply names the source that did not. Example prompt: "Is there a free legal copy of the Calculus textbook by Stewart, or something close to it?"
+Search for free and legal copies of a textbook, including open educational resources (OER), on OpenStax, the Directory of Open Access Books (DOAB) and Open Library. Inputs: query (a book title, an ISBN or a course topic such as "organic chemistry") and an optional limit of 1 to 10 results from each source. Open Library results are marked free when there is a public domain copy to read online, and borrow when the book is a free loan. No account or key is needed. If one source is down the others still answer and the reply names the source that did not. Example prompt: "Is there a free legal copy of the Calculus textbook by Stewart, or something close to it?"
 
 Parameters:
 - query (string, required): A textbook title, an ISBN (10 or 13 digits, hyphens allowed) or a course topic.
@@ -42,7 +42,7 @@ Output: a line such as "Found 3 free copies for "calculus":" followed by one lin
 Structured output: query, isbn when the query was an ISBN, results and sources_unavailable. The results array holds one entry per book with source, title, authors, url, access and note, plus year when the source gives one.
 
 ### lookup_isbn
-Look up an ISBN on Open Library and return the edition details plus the other editions of the same book. Inputs: isbn (10 or 13 digits, hyphens allowed). The check digit is tested first, so a typo is reported before any search. The reply has the title, authors, publisher, publish date, page count and edition name, and says whether a free copy is known. Related editions are listed newest first. Example prompt: "Look up ISBN 978-0-13-468599-1 and tell me what other editions exist."
+ISBN lookup on Open Library: return the edition details plus the other editions of the same book. Inputs: isbn (10 or 13 digits, hyphens allowed). The check digit is tested first, so a typo is reported before any search. The reply has the title, authors, publisher, publish date, page count and edition name, and says whether a free copy is known. Related editions are listed newest first. Example prompt: "Look up ISBN 978-0-13-468599-1 and tell me what other editions exist."
 
 Parameters:
 - isbn (string, required): The ISBN to look up, 10 or 13 digits, hyphens and spaces allowed.

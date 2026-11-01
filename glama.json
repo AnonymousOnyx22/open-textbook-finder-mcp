@@ -16,7 +16,7 @@
   "tools": [
     {
       "name": "find_free_textbook",
-      "description": "Search for free and legal copies of a textbook on OpenStax, the Directory of Open Access Books (DOAB) and Open Library. Inputs: query (a book title, an ISBN or a course topic such as \"organic chemistry\") and an optional limit of 1 to 10 results from each source. Open Library results are marked free when there is a public domain copy to read online, and borrow when the book is a free loan. No account or key is needed. If one source is down the others still answer and the reply names the source that did not. Example prompt: \"Is there a free legal copy of the Calculus textbook by Stewart, or something close to it?\"",
+      "description": "Search for free and legal copies of a textbook, including open educational resources (OER), on OpenStax, the Directory of Open Access Books (DOAB) and Open Library. Inputs: query (a book title, an ISBN or a course topic such as \"organic chemistry\") and an optional limit of 1 to 10 results from each source. Open Library results are marked free when there is a public domain copy to read online, and borrow when the book is a free loan. No account or key is needed. If one source is down the others still answer and the reply names the source that did not. Example prompt: \"Is there a free legal copy of the Calculus textbook by Stewart, or something close to it?\"",
       "parameters": [
         {
           "name": "query",
@@ -44,7 +44,7 @@
     },
     {
       "name": "lookup_isbn",
-      "description": "Look up an ISBN on Open Library and return the edition details plus the other editions of the same book. Inputs: isbn (10 or 13 digits, hyphens allowed). The check digit is tested first, so a typo is reported before any search. The reply has the title, authors, publisher, publish date, page count and edition name, and says whether a free copy is known. Related editions are listed newest first. Example prompt: \"Look up ISBN 978-0-13-468599-1 and tell me what other editions exist.\"",
+      "description": "ISBN lookup on Open Library: return the edition details plus the other editions of the same book. Inputs: isbn (10 or 13 digits, hyphens allowed). The check digit is tested first, so a typo is reported before any search. The reply has the title, authors, publisher, publish date, page count and edition name, and says whether a free copy is known. Related editions are listed newest first. Example prompt: \"Look up ISBN 978-0-13-468599-1 and tell me what other editions exist.\"",
       "parameters": [
         {
           "name": "isbn",
